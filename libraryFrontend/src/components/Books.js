@@ -4,8 +4,11 @@ const Books = (props) => {
   if (!props.show) {
     return null
   }
+  else if(props.result.loading){
+    return <div>loading...</div>
+  }
 
-  const books = []
+  const books = props.result.data.allBooks
 
   return (
     <div>
