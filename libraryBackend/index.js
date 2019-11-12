@@ -176,8 +176,8 @@ const resolvers = {
       if(!author){
         return null
       }
-      const updatedAuthor = { ...author, born: 1970}
-      authors.map(authors => authors.name === args.name ? updatedAuthor : authors)
+      const updatedAuthor = { ...author, born: args.born}
+      authors = authors.map(authors => authors.name === args.name ? updatedAuthor : authors)
       return updatedAuthor
     }
   }
@@ -187,7 +187,6 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
 })
-
 
 
 server.listen().then(({ url }) => {

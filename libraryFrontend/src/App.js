@@ -1,12 +1,17 @@
 import React, { useState } from 'react'
-import { Query, ApolloConsumer, Mutation } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
+import { useMutation } from '@apollo/react-hooks'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
-import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from './Queryes'
+import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR } from './Queryes'
 
 const App = () => {
   const [page, setPage] = useState('authors')
+
+  const [changeBirthyear] = useMutation(EDIT_BIRTHYEAR, {
+    refetchQueries: [{query: ALL_AUTHORS}]
+  })
 
   return (
     <div>
@@ -17,7 +22,7 @@ const App = () => {
       </div>
 
       <Query query = {ALL_AUTHORS}>
-        {(result) => <Authors show = {page === 'authors'} result = {result} />}
+        {(result) => <Authors show = {page === 'authors'} result = {result} editAuthor = {changeBirthyear}/>}
       </Query>
 
       <Query query = {ALL_BOOKS}>
@@ -31,7 +36,6 @@ const App = () => {
           <NewBook show = {page === 'add'} addBook = {addBook} />
         }
       </Mutation>
-
     </div>
   )
 }
