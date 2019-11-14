@@ -10,7 +10,7 @@ const Authors = (props) => {
     return <div>loading...</div>
   }
 
-  const editBorn = async (e) => {
+ const editBorn = async (e) => {
     e.preventDefault()
     const birthYear = Number(born)
     await props.editAuthor({

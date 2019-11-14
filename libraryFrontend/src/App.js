@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Query, Mutation } from 'react-apollo'
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation } from 'react-apollo-hooks'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
@@ -22,7 +22,7 @@ const App = () => {
       </div>
 
       <Query query = {ALL_AUTHORS}>
-        {(result) => <Authors show = {page === 'authors'} result = {result} editAuthor = {changeBirthyear}/>}
+        {(result) => <Authors show = {page === 'authors'} result = {result}  editAuthor = {changeBirthyear}/>}
       </Query>
 
       <Query query = {ALL_BOOKS}>
