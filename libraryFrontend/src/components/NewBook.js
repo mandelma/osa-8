@@ -31,6 +31,11 @@ const NewBook = (props) => {
 
   return (
     <div>
+      {props.errorMessage &&
+        <div style = {{color: 'red'}}>
+          {props.errorMessage}
+        </div>
+      }
       <form onSubmit={submit}>
         <div>
           title
