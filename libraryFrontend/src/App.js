@@ -9,6 +9,7 @@ import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR } from './queryes_m
 const App = () => {
   const [page, setPage] = useState('authors')
   const [errorMessage, setErrorMessage] = useState(null)
+  //const [token, setToken] = useState(null)
 
   const handleError = (error) => {
     //setErrorMessage(error.graphQLErrors[0].message)
@@ -21,6 +22,10 @@ const App = () => {
   const [changeBirthyear] = useMutation(EDIT_BIRTHYEAR, {
     refetchQueries: [{query: ALL_AUTHORS}]
   })
+
+  /* const [login] = useMutation(LOGIN, {
+    onError: handleError
+  }) */
 
   return (
     <div>

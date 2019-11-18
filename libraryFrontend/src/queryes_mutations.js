@@ -24,6 +24,14 @@ const ALL_BOOKS = gql`
 }
 `
 
+const LOGIN = gql`
+mutation login($username: String!, $password: String!){
+  login(username: $username, password: $password){
+    value
+  }
+}
+`
+
 const CREATE_BOOK = gql`
 mutation createBook(
   $title: String!, $published: String!, $author: String!, $genres: [String!]
