@@ -16,6 +16,7 @@ const Authors = (props) => {
     await props.editAuthor({
       variables: { name, birthYear }
     })
+    console.log('user:', localStorage.getItem('kirjasto-user-token'))
     setName('')
     setBorn('')
   }

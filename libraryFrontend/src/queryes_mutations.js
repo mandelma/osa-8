@@ -62,4 +62,4 @@ mutation editBirthyear($name: String!, $birthYear: Int!){
 }
 `
 
-export { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR }
+export { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR, LOGIN }

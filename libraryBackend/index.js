@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { ApolloServer, UserInputError, gql } = require('apollo-server')
+const { ApolloServer, UserInputError, AuthenticationError, gql } = require('apollo-server')
 const mongoose = require('mongoose')
 const Book = require('./models/books')
 const Author = require('./models/authors')
@@ -147,7 +147,7 @@ const resolvers = {
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
 
-      if(!user || args.password !== 'salasana'){
+      if(!user || args.password !== 'salainen'){
         throw new UserInputError('wrong credentials')
       }
 

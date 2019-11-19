@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import { Query, Mutation } from 'react-apollo'
-import { useMutation } from 'react-apollo-hooks'
+import { useMutation, useApolloClient } from 'react-apollo-hooks'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
-import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR } from './queryes_mutations'
+import LoginForm from './components/LoginForm'
+import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR, LOGIN } from './queryes_mutations'
 
 const App = () => {
   const [page, setPage] = useState('authors')
   const [errorMessage, setErrorMessage] = useState(null)
-  //const [token, setToken] = useState(null)
+  const [token, setToken] = useState(null)
+
+  const client = useApolloClient()
 
   const handleError = (error) => {
     //setErrorMessage(error.graphQLErrors[0].message)
@@ -19,20 +22,38 @@ const App = () => {
     }, 10000)
   }
 
+    const loginError = () => {
+      if(errorMessage === null){
+        return <div></div>
+      }
+    return <div style = {{color: 'red'}}>{errorMessage}</div>
+    }
+
   const [changeBirthyear] = useMutation(EDIT_BIRTHYEAR, {
     refetchQueries: [{query: ALL_AUTHORS}]
   })
 
-  /* const [login] = useMutation(LOGIN, {
+  const [login] = useMutation(LOGIN, {
     onError: handleError
-  }) */
+  })
+
+  const logOut = () => {
+    setToken(null)
+    localStorage.clear()
+    client.resetStore()
+  }
+
+  const userIn = localStorage.getItem('kirjasto-user-token')
 
   return (
     <div>
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
-        <button onClick={() => setPage('add')}>add book</button>
+        
+        {userIn ? <button onClick={() => setPage('add')}>add book</button> : null}
+        {!userIn ? <button onClick = {() => setPage('login')}>login</button> 
+          : <button onClick = {logOut}>log out</button>}
       </div>
 
       <Query query = {ALL_AUTHORS}>
@@ -53,6 +74,14 @@ const App = () => {
           />
         }
       </Mutation>
+      <LoginForm
+        show = {page === 'login'}
+        setErrorMessage = {setErrorMessage}
+        errorMessage = {loginError}
+        login = {login}
+        setToken = {setToken}
+        setPage = {setPage}
+      />
     </div>
   )
 }
