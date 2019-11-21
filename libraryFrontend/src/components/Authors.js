@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 const Authors = (props) => {
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
+
   if (!props.show) {
     return null
   }
@@ -12,19 +13,29 @@ const Authors = (props) => {
 
  const editBorn = async (e) => {
     e.preventDefault()
-    const birthYear = Number(born)
-    await props.editAuthor({
-      variables: { name, birthYear }
-    })
-    console.log('user:', localStorage.getItem('kirjasto-user-token'))
+    try{
+      const birthYear = Number(born)
+      await props.editAuthor({
+        variables: { name, birthYear }
+      })
+    }catch(error){
+      props.setErrorMessage(error.message)
+      setTimeout(() => {
+        props.setErrorMessage(null)
+      }, 5000)
+    }
+    
     setName('')
     setBorn('')
+
   }
-
   const authors = props.result.data.allAuthors
-
   return (
     <div>
+      {props.errorMessage &&
+      <div style = {{color: 'red'}}>
+        {props.errorMessage}
+      </div>   }
       <h2>authors</h2>
       <table>
         <tbody>

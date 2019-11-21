@@ -6,10 +6,11 @@ const Books = (props) => {
   if (!props.show) {
     return null
   }
-  else if(props.result.loading){
+  if(props.bookList.loading){
     return <div>loading...</div>
   }
 
+  const books = props.bookList.data.allBooks
   const genreButtons = () => {
     return(
       <div>
@@ -22,7 +23,9 @@ const Books = (props) => {
     )
   }
   
-  const books = props.result.data.allBooks
+  const userIn = localStorage.getItem('kirjasto-user-token')
+
+  
 
   if(genre){
     return(
@@ -53,7 +56,6 @@ const Books = (props) => {
                 <td>{a.published}</td>
               </tr> : null
             )}
-            
           </tbody>
         </table>
         {genreButtons()}

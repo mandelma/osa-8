@@ -8,28 +8,14 @@ const LoginForm = (props) => {
     return null
   }
 
-  const submit = async (event) => {
+  const submit = (event) => {
     event.preventDefault()
-    try{
-      const result = await props.login({
-        variables: { username, password }
-      })
-      
-      if(result){
-        const token = result.data.login.value
-        props.setToken(token)
-        localStorage.setItem('kirjasto-user-token', token)
-        props.setPage('authors')
-      }
-    }catch(error){
-      props.setErrorMessage('wrong username or password')
-      setTimeout(() => {
-        props.setErrorMessage(null)
-      }, 5000)
-    }
+    props.login(username, password)
+    
     setUsername('')
     setPassword('')
   }
+
   return(
     <div>
     {props.errorMessage()}

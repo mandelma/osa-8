@@ -32,6 +32,15 @@ mutation login($username: String!, $password: String!){
 }
 `
 
+const GENRE = gql`
+{
+  me {
+    username
+    favoriteGenre
+  }
+}
+`
+
 const CREATE_BOOK = gql`
 mutation createBook(
   $title: String!, $published: String!, $author: String!, $genres: [String!]
@@ -61,5 +70,18 @@ mutation editBirthyear($name: String!, $birthYear: Int!){
   }
 }
 `
+const BOOKS_BY_GENRE = gql`
+query booksByGenre($genre: String!){
+  allBooks(genre: $genre){
+    title
+    author{
+      name
+      born
+    }
+    published
+    genres
+  }
+}
+`
 
-export { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR, LOGIN }
+export { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, EDIT_BIRTHYEAR, LOGIN, GENRE, BOOKS_BY_GENRE }

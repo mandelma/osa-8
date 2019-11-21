@@ -83,7 +83,7 @@ const resolvers = {
       return context.currentUser
     },
 
-    authorCount: () => Author.collection.countDocuments(),
+    authorCount: () => { return Author.collection.countDocuments() },
 
     allBooks: async (root, args) => {
       if(!args.name && !args.genre){
@@ -91,13 +91,11 @@ const resolvers = {
         return books
       }
       else if(args.genre && !args.name){
-        const books = await Book.find({ genres: {$in: [args.genre] }})
-        return books
+        return await Book.find({ genres: {$in: [args.genre] }})
       }
       else if(!args.genre && args.name){
-        const author = await Author.findOne({name: args.name})
-        const books = await Book.find({ author: author._id })
-        return books
+        const author =  Author.findOne({name: args.name})
+        return await Book.find({ author: author._id })
       }   
     },
 
@@ -167,9 +165,11 @@ const resolvers = {
       if(!authorExist){
         try {
         const author = new Author({ name: args.author })
-        await author.save()
+        if(args.title.length >= 2){
+          await author.save()
+        }   
         const book = new Book({ ...args, author: author._id })
-        await book.save()
+        await book.save() 
         console.log('newBook:', book)
         return Book.findById(book._id).populate('author')
       }catch(error){
