@@ -1,52 +1,60 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useApolloClient } from 'react-apollo-hooks'
 
-const Recommended = (props) => {
-  if(!props.show){
+import { GENRE, BOOKS_BY_GENRE } from '../queryes_mutations'
+
+const Recommended = ({ result, show }) => {
+  const [favBooks, setFavBooks] = useState([])
+  const [genre, setGenre] = useState('')
+  const client = useApolloClient()
+
+  const userIn = localStorage.getItem('kirjasto-user-token')
+
+  useEffect(() => {
+    favoriteBooks()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result])
+
+  
+  const favoriteBooks = async () => {
+   if(!userIn){
+      return
+    }
+    const favGenre = await client.query({
+      query: GENRE
+    })
+    setGenre(favGenre.data.me.favoriteGenre)
+    const favorite = await client.query({
+      query: BOOKS_BY_GENRE,
+      variables: {genre: genre}
+    })
+    setFavBooks(favorite.data.allBooks)
+  }
+  
+  if(!show){
     return null
   }
 
-  const userIn = localStorage.getItem('kirjasto-user-token')
-  
-  if(userIn){
-    if(props.result.loading){
-      return(
-        <div>
-          loading...
-        </div>
-      )
-    }
-    
-    const genre = props.genre.data.me
-    const userGenre = genre ? genre.favoriteGenre : 'loading...'
-    const books = props.result.data.allBooks
-
-    return(
-      <div>
-        <table>
-          <tbody>
-            <tr>
-              <th>title</th>
-              <th>author</th>
-              <th>published</th>
+  return(
+    <div>
+      <table>
+        <tbody>
+          <tr>
+            <th>title</th>
+            <th>author</th>
+            <th>published</th>
+          </tr>
+          {favBooks.map(book => 
+            <tr key = {book.title}>
+              <td>{book.title}</td>
+              <td>{book.author.name}</td>
+              <td>{book.published}</td>
             </tr>
-            {books.map(book => book.genres.find(g => userIn && g.includes(userGenre)) ?
-              <tr key = {book.title}>
-                <td>{book.title}</td>
-                <td>{book.author.name}</td>
-                <td>{book.published}</td>
-              </tr> : null
-              )}
-            
-          </tbody>
-        </table>
-      </div>
-    )
-  }else{
-    return(
-      <div></div>
-    )
-  }
+            )}
+        </tbody>
+      </table>
+    </div>
+  )
 }
- 
 
 export default Recommended

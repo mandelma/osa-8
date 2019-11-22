@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Query, Mutation } from 'react-apollo'
-import { useQuery, useMutation, useApolloClient } from 'react-apollo-hooks'
+import { Query, Mutation, ApolloConsumer } from 'react-apollo'
+import { useQuery, useMutation } from 'react-apollo-hooks'
+import { useApolloClient } from 'react-apollo'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
@@ -62,7 +63,6 @@ const App = () => {
         setErrorMessage(null)
       }, 5000)
     }
-    
   }
 
   const logOut = () => {
@@ -115,7 +115,6 @@ const App = () => {
         show = {page === 'login'}
         setErrorMessage = {setErrorMessage}
         errorMessage = {loginError}
-        //login = {login}
         login = {logIn}
         setToken = {setToken}
         setPage = {setPage}

@@ -91,11 +91,11 @@ const resolvers = {
         return books
       }
       else if(args.genre && !args.name){
-        return await Book.find({ genres: {$in: [args.genre] }})
+        return Book.find({ genres: {$in: [args.genre] }}).populate('author')
       }
       else if(!args.genre && args.name){
-        const author =  Author.findOne({name: args.name})
-        return await Book.find({ author: author._id })
+        const author = await Author.findOne({name: args.name})
+        return Book.find({ author: author._id }).populate('author')
       }   
     },
 

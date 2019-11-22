@@ -1,40 +1,61 @@
 import React, { useState } from 'react'
+import { useApolloClient } from 'react-apollo-hooks'
 
+import { BOOKS_BY_GENRE } from '../queryes_mutations'
+  
 const Books = (props) => {
-  const [genre, setGenre] = useState('')
-
+  const [gBooks, setBooks] = useState([])
+  const [bookGenres, setBookGenres] = useState([])
+  const client = useApolloClient()
+  
   if (!props.show) {
     return null
   }
   if(props.bookList.loading){
-    return <div>loading...</div>
+    return (<div>loading...</div>)
+  }
+  
+  const books = props.bookList.data.allBooks
+  
+  books.forEach(book => {
+    book.genres.forEach(genre => {
+      if(!bookGenres.includes(genre)){
+        setBookGenres(bookGenres.concat(genre))
+      }
+    })
+  });
+
+  const bookByGenre = async (genre) => {
+    if(genre === 'all'){
+      setBooks(books)
+    }
+    const bookGenre = await client.query({
+      query: BOOKS_BY_GENRE,
+      variables: {genre: genre}
+    })
+    setBooks(bookGenre.data.allBooks)
   }
 
-  const books = props.bookList.data.allBooks
   const genreButtons = () => {
     return(
       <div>
-        <button onClick = {() => setGenre('classic')}>classic</button>
-        <button onClick = {() => setGenre('horror')}>horror</button>
-        <button onClick = {() => setGenre('design')}>desing</button>
-        <button onClick = {() => setGenre('crime')}>crime</button>
-        <button onClick = {() => setGenre('all')}>all genres</button>
+        {bookGenres.map(genre => <button key = {genre}
+        onClick = {() => bookByGenre(genre)}>{genre}</button>)}
+        <button  onClick = {() => bookByGenre('all')}>all genres</button>
       </div>
     )
   }
-  
-  const userIn = localStorage.getItem('kirjasto-user-token')
 
-  
-
-  if(genre){
+  if(gBooks.length > 0){
     return(
       <div>
         <h2>books</h2>
         <table>
           <tbody>
             <tr>
-              <th></th>
+              <th>
+                title
+              </th>
               <th>
                 author
               </th>
@@ -42,20 +63,10 @@ const Books = (props) => {
                 published
               </th>
             </tr>
-            {books.map(a =>  a.genres.find(g => g.includes(genre)) ?
-              <tr key={a.title}>
-                <td>{a.title}</td>
-                <td>{a.author.name}</td>
-                <td>{a.published}</td>
-              </tr> : null
-            )}
-            {books.map(a =>  genre === 'all' ?
-              <tr key={a.title}>
-                <td>{a.title}</td>
-                <td>{a.author.name}</td>
-                <td>{a.published}</td>
-              </tr> : null
-            )}
+            {gBooks.map(book => 
+              <tr key = {book.title}>
+                <td>{book.title}</td>
+              </tr>)}
           </tbody>
         </table>
         {genreButtons()}
@@ -69,7 +80,7 @@ const Books = (props) => {
       <table>
         <tbody>
           <tr>
-            <th></th>
+            <th>title</th>
             <th>
               author
             </th>

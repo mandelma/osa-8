@@ -70,7 +70,6 @@ const Authors = (props) => {
               {author.name}
           </option>)}
         </select><br/>
-
         <label>Born:</label><br/>
         <input
           type = 'number'
