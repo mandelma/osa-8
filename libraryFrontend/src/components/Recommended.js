@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useApolloClient } from 'react-apollo-hooks'
 
-import { GENRE, BOOKS_BY_GENRE } from '../queryes_mutations'
+import { GENRE, BOOKS_BY_GENRE, ALL_AUTHORS, ALL_BOOKS } from '../queryes_mutations'
 
 const Recommended = ({ result, show }) => {
   const [favBooks, setFavBooks] = useState([])
@@ -26,7 +26,8 @@ const Recommended = ({ result, show }) => {
     setGenre(favGenre.data.me.favoriteGenre)
     const favorite = await client.query({
       query: BOOKS_BY_GENRE,
-      variables: {genre: genre}
+      variables: {genre: genre},
+      fetchPolicy: 'no-cache'
     })
     setFavBooks(favorite.data.allBooks)
   }

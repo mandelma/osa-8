@@ -8,7 +8,7 @@ import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Recommended from './components/Recommended'
 import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, 
-  EDIT_BIRTHYEAR, LOGIN, GENRE, BOOKS_BY_GENRE  } from './queryes_mutations'
+  EDIT_BIRTHYEAR, LOGIN, GENRE  } from './queryes_mutations'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -69,6 +69,7 @@ const App = () => {
     setToken(null)
     localStorage.clear()
     client.resetStore()
+    setPage('authors')
   }
 
   const userIn = localStorage.getItem('kirjasto-user-token')

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useApolloClient } from 'react-apollo-hooks'
 
-import { BOOKS_BY_GENRE } from '../queryes_mutations'
+import { BOOKS_BY_GENRE, ALL_BOOKS } from '../queryes_mutations'
   
 const Books = (props) => {
   const [gBooks, setBooks] = useState([])
@@ -31,7 +31,15 @@ const Books = (props) => {
     }
     const bookGenre = await client.query({
       query: BOOKS_BY_GENRE,
-      variables: {genre: genre}
+      variables: {genre: genre},
+      update: (store, response) => {
+        const data = store.readQuery({ query: ALL_BOOKS })
+        data.allBooks.push(response.data.bookGenre)
+        store.writeQuery({
+          query: ALL_BOOKS,
+          data:data
+        })
+      }
     })
     setBooks(bookGenre.data.allBooks)
   }
