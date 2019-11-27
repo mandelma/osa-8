@@ -1,36 +1,86 @@
 import React, { useState } from 'react'
-import { Query, Mutation, ApolloConsumer } from 'react-apollo'
-import { useQuery, useMutation } from 'react-apollo-hooks'
-import { useApolloClient } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
+import { useQuery, useMutation, useSubscription, useApolloClient } from 'react-apollo-hooks'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Recommended from './components/Recommended'
-import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, 
+import { BOOK_ADDED } from './subscriptions'
+import { ALL_AUTHORS, CREATE_BOOK, ALL_BOOKS,
   EDIT_BIRTHYEAR, LOGIN, GENRE  } from './queryes_mutations'
 
 const App = () => {
   const [page, setPage] = useState('authors')
   const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
   const [token, setToken] = useState(null)
 
   const client = useApolloClient()
 
   const handleError = (error) => {
     //setErrorMessage(error.graphQLErrors[0].message)
-    setErrorMessage(error.graphQLErrors[0].message)
+    setMessage(error.graphQLErrors[0].message)
     setTimeout(() => {
-      setErrorMessage(null)
+      setMessage(null)
     }, 10000)
   }
 
-    const loginError = () => {
-      if(errorMessage === null){
-        return <div></div>
-      }
-    return <div style = {{color: 'red'}}>{errorMessage}</div>
+  const notify = (message) => {
+    setMessage(message)
+    setTimeout(() => {
+      setMessage(null)
+    }, 3000)
+  }
+
+  const loginError = () => {
+    if(errorMessage === null){
+      return <div></div>
     }
+  return <div style = {{color: 'red'}}>{errorMessage}</div>
+  }
+
+  const updateCacheWith = (addedBook) => {
+    const includeAuthorIn = (set, object) => {
+      set.map(a => a.name).includes(object.author.name)
+    }
+    const authorDataInStore = client.readQuery({ query: ALL_AUTHORS })
+
+    const findAuthor = includeAuthorIn(authorDataInStore.allAuthors, addedBook)
+    if(!findAuthor){
+      
+      authorDataInStore.allAuthors.push(addedBook.author)
+    
+      client.writeQuery({
+        query: ALL_AUTHORS,
+        data: authorDataInStore
+      })
+    }
+
+    const includeBookIn = (set, object) => {
+      set.map(b => b.id).includes(object.id)
+    }
+
+    const bookDataInStore = client.readQuery({ query: ALL_BOOKS})
+    
+    if(!includeBookIn(bookDataInStore.allBooks, addedBook)){
+      bookDataInStore.allBooks.push(addedBook)
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: bookDataInStore
+      })
+    }
+  }
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedAuthor = subscriptionData.data.bookAdded.author
+
+      const addedBook = subscriptionData.data.bookAdded
+      notify(`New book '${addedBook.title}' from ${addedAuthor.name}`)
+      updateCacheWith(addedBook)
+    }
+  })
 
   const [changeBirthyear] = useMutation(EDIT_BIRTHYEAR, {
     refetchQueries: [{query: ALL_AUTHORS}],
@@ -83,7 +133,7 @@ const App = () => {
         {!userIn ? <button onClick = {() => setPage('login')}>login</button> 
           : <button onClick = {logOut}>log out</button>}
       </div>
-
+      {message && <div style = {{color: 'green'}}>{message}</div>}
       <Query query = {ALL_AUTHORS} onError = {handleError}>
         {(result) => <Authors show = {page === 'authors'} result = {result} 
          editAuthor = {changeBirthyear} errorMessage = {errorMessage}
@@ -97,7 +147,10 @@ const App = () => {
 
       <Mutation mutation = {CREATE_BOOK}
         refetchQueries={[{ query: ALL_BOOKS}, {query: ALL_AUTHORS}]}
-        onError = {handleError}>
+        onError = {handleError}
+        update = {(store, response) => {
+          updateCacheWith(response.data.addBook)}}
+        >
         
         {(addBook) => 
           <NewBook show = {page === 'add'} addBook = {addBook}

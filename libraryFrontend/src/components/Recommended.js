@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useApolloClient } from 'react-apollo-hooks'
 
-import { GENRE, BOOKS_BY_GENRE, ALL_AUTHORS, ALL_BOOKS } from '../queryes_mutations'
+import { GENRE, BOOKS_BY_GENRE } from '../queryes_mutations'
 
 const Recommended = ({ result, show }) => {
   const [favBooks, setFavBooks] = useState([])

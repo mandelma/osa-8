@@ -74,6 +74,8 @@ const Books = (props) => {
             {gBooks.map(book => 
               <tr key = {book.title}>
                 <td>{book.title}</td>
+                <td>{book.author.name}</td>
+                <td>{book.published}</td>
               </tr>)}
           </tbody>
         </table>
